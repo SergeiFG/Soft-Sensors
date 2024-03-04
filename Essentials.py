@@ -19,48 +19,62 @@ from sklearn.metrics import r2_score
 
 # # Определение основных функций подготовки данных и визуализации для создания моделей Виртуальных Анализаторов
 
+# Ниже описан класс, который следует использовать в качестве шаблона для построения собственных моделей виртуальных анализаторов. Необходимо отнаследовать его и переопределить все абстрактные методы. Изменение метода test() не допускается. На вход модель должна получать numpy.ndarray фиксированной формы {N, C} для Х и {N, 1} для Y, в качестве выхода она также должна предоставлять массив Y той же формы {N, 1}.
+
 # In[2]:
 
 
 class SoftSensor(ABC):    
     @abstractmethod
     def __init__(self, name: str):
+        """Метод инициализации экземпляра, выполняется при создании экземпляра, описанные здесь строки можно выполнить через super().__init__()"""
         self.__model = None
         self.__name = name
 
     @abstractmethod
     def prepocessing(self):
+        """Метод предобработки данных, в него может входить изменение типа данных, изменение формы массива, изменение области значений и так далее """
         pass
 
     @abstractmethod
     def postprocessing(self):
+        """Метод, обратный предобратоки, позволяет вывести значения, похожие на исходные данные"""
         pass
 
     @abstractmethod
     def evaluate_model(self):
+        """Метод обработки данных обученной моделью, принимает на вход numpy массивы Х {N, C} и Y{N,1}, где N - число точек, C - число каналов данных Х"""
         pass
 
     @abstractmethod
     def train(self):
+        """Метод обучения модели по тестовой выборке"""
         pass
 
     @abstractmethod
     def __str__(self):
+        """Метод, срабатывающий при выводе функции print() над экземляром класса, полезен при дебагинге, помогает продемонстрировать работу"""
         pass
     
     def get_model(self):
+        """Получение модели экземляра класса"""
         return self.__model
 
     def set_model(self, model):
+        """Установка нового значения в модель экземпляра класса"""
         self.__model = model
 
     def get_name(self):
+        """Получение имени экзмпляра класса"""
         return self.__name
 
     def set_name(self, name):
+        """Установка имени экземпляра класса"""
         self.__name = name
 
     def test(self, x_test: np.ndarray, y_test: np.ndarray, metric):
+        """Метод для обработки тестовой выборки, не подлжежит редактированию в потомках. Возвращает ошибки при неверных типах данных или проблемах в вычислении. 
+        Проводит вычисления в порядке: предобработка, вычисление модели, постобработка, вычисление метрики. Возвращает вектор предсказанных значений и метрику качества"""
         if len(x_test.shape) != 2:
             raise AttributeError('Wrong data shape X')
         if y_test.shape[1] != 1 and len(y_test.shape) != 2:
@@ -68,7 +82,7 @@ class SoftSensor(ABC):
 
         try:
             x_preproc_values = self.prepocessing(x_test)
-            y_preproc_values = self.prepocessing(y_test)
+            # y_preproc_values = self.prepocessing(y_test)
         except BaseException as err:
             print('Prepocessing error', err)
             raise err
@@ -80,15 +94,15 @@ class SoftSensor(ABC):
             raise err
 
         try:
-            metric_value = metric.evaluate(pred_values, y_preproc_values)
-        except BaseException as err:
-            print('Metric evaluation error', err)
-            raise err
-
-        try:
             post_values = self.postprocessing(pred_values)
         except BaseException as err:
             print('Postprocessing error', err)
+            raise err
+            
+        try:
+            metric_value = metric.evaluate(post_values, y_test)
+        except BaseException as err:
+            print('Metric evaluation error', err)
             raise err
             
         if type(post_values) != np.ndarray:
@@ -99,6 +113,8 @@ class SoftSensor(ABC):
         return post_values, metric_value
         
 
+
+# Ниже описан абстрактный класс с шаблоном для метрик, нет нужды его использовать для своих моделей, так как мы будем общие классы метрики для всех моделей
 
 # In[3]:
 
@@ -130,6 +146,8 @@ class MetricTemplate(ABC):
     def get_name(self):
         return self.__name
 
+
+# Класс визуализатора, не требует наследования или переопределения, достаточно создать экземпляр с собственной тестовой выборкой и применить метод visualize() к моделям. Имеет смысл проверить работу своей модели отдельно с его помощью
 
 # In[4]:
 
@@ -187,11 +205,7 @@ class Visualizer():
             
 
 
-# In[ ]:
-
-
-
-
+# Пример простейшей метрики
 
 # In[5]:
 
@@ -204,6 +218,8 @@ class MSE(MetricTemplate):
     def __call__(self, y_pred, y_real):
         return ((y_pred-y_real)**2).mean().item()
 
+
+# Класс метрики, используемой для вычисления Коэффициента детерминации, основная используемая нами метрика
 
 # In[6]:
 
