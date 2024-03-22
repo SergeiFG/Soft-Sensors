@@ -32,7 +32,7 @@ class SoftSensor(ABC):
         self.__name = name
 
     @abstractmethod
-    def prepocessing(self):
+    def preprocessing(self):
         """Метод предобработки данных, в него может входить изменение типа данных, изменение формы массива, изменение области значений и так далее """
         pass
 
@@ -81,7 +81,7 @@ class SoftSensor(ABC):
             raise AttributeError('Wrong data shape Y') 
 
         try:
-            x_preproc_values = self.prepocessing(x_test)
+            x_preproc_values = self.preprocessing(x_test)
             # y_preproc_values = self.prepocessing(y_test)
         except BaseException as err:
             print('Prepocessing error', err)
@@ -133,7 +133,7 @@ class MetricTemplate(ABC):
 
     def evaluate(self, y_pred, y_real):
         try:
-            value = self.__call__(y_pred, y_real)
+            value = self.__call__(y_real, y_pred)
         except BaseException as err:
             print('Metric evaluation error')
             raise err
@@ -228,7 +228,7 @@ class R2Metric(MetricTemplate):
     def __init__(self):
         super().__init__('Coefficient of determination')
 
-    def __call__(self, y_pred, y_real):
+    def __call__(self, y_real, y_pred):
         return sklearn.metrics.r2_score(y_real, y_pred)
 
 
