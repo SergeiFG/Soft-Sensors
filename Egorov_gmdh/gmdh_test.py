@@ -78,11 +78,14 @@ class gmdh_Ria(Essentials.SoftSensor):
         preproc_x = self.preprocessing(x_train)
         seq_criterion=SequentialCriterion(criterion_type=CriterionType.SYM_REGULARITY, second_criterion_type=CriterionType.SYM_ABSOLUTE_NOISE_IMMUNITY, solver=Solver.ACCURATE, top=2)
         model = gmdh.Ria()
+
+        # вывод основной информации о параметрах методов и использовании критериев
+
         #help(seq_criterion)
         #help(model.fit)
 
         # Метод подбора параметров обучения. При изменении параметров k_best и test_size возможно получить адекватные показатели коэффициента детерминации для каждого набора данных
-
+        # (реализация не закончена, класс gmdh не имеет функции взятия параметров)
         #param_dist = {
         #    'k_best': range(3, 18, 1),
         #    'test_size': [i/100 for i in range(20, 71)],
