@@ -3,6 +3,7 @@
 import sys
 sys.path.append("..")
 import Essentials
+import Visualizer_pred
 
 # Подключение необходимых для алгоритма библиотек
 
@@ -120,5 +121,5 @@ Test_sensor_1.test(x1, y1, metric)
 
 # Визуализация работы алгоритма
 
-test_visual=Essentials.Visualizer(x1, y1, timestamp1, [metric], 'Test gmdh Ria Sensor R2 metric')
-test_visual.visualize([Test_sensor_1])
+test_visual=Visualizer_pred.Visualizer(x1, y1, timestamp1, [metric], 'Test gmdh Ria Sensor R2 metric')
+test_visual.visualize([Test_sensor_1], lines=True)
