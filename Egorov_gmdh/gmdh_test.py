@@ -43,7 +43,7 @@ print(x2.shape, "\n")
 
 class gmdh_Ria(Essentials.SoftSensor):
     def __init__(self, x_train, y_train):
-        super().__init__('Test')
+        super().__init__('gmdh')
         self.x_scaler = StandardScaler()
         self.y_scaler = StandardScaler()
         self.x_scaler.fit(x_train)
@@ -104,11 +104,12 @@ class gmdh_Ria(Essentials.SoftSensor):
 
     def __str__(self):
         model=self.get_model()
-        return f"Наилучшая найденная модель: \n = {model.get_best_polynomial()}"
+        return f"Наилучшая найденная модель: \n {model.get_best_polynomial()}"
 
 # Создание экземпляра класса с алгоритмом gmdh mia
 
 Test_sensor_1=gmdh_Ria(x2, y2)
+Test_sensor_2=gmdh_Ria(x2, y2)
 #print(x2)
 # Пример работы метода str
 
@@ -117,9 +118,11 @@ print(Test_sensor_1)
 # Создание экземпляра метрики
 
 metric = Essentials.R2Metric()
+metric2=Essentials.R2Metric()
 Test_sensor_1.test(x1, y1, metric)
+Test_sensor_2.test(x1,y1,metric2)
 
 # Визуализация работы алгоритма
 
-test_visual=Visualizer_pred.Visualizer(x1, y1, timestamp1, [metric], 'Test gmdh Ria Sensor R2 metric')
-test_visual.visualize([Test_sensor_1], lines=True)
+test_visual=Visualizer_pred.Visualizer(x1, y1, timestamp1,[metric, metric2], 'Test gmdh Ria Sensor R2 metric')
+test_visual.visualize([Test_sensor_1, Test_sensor_2], lines=True)
