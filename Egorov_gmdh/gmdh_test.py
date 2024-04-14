@@ -22,22 +22,39 @@ a=np.load('../Data_Average.npz', allow_pickle=True)
 
 x1=a['X_test_2']
 x2=a['X_train_2']
+x11=a['X_test_1']
+x21=a['X_train_1']
 
 y1=a['Y_test_2']
 y2=a['Y_train_2']
+y11=a['Y_test_1']
+y21=a['Y_train_1']
 
 timestamp1=y1[:, 1]
 timestamp2=y2[:, 1]
+
+timestamp11=y11[:, 1]
+timestamp21=y21[:, 1]
 
 y1 = y1[:, 0].reshape(len(y1), 1)
 y1 = y1.astype(np.float64)
 y2 = y2[:, 0].reshape(len(y2), 1)
 y2 = y2.astype(np.float64)
 
+y11=y11[:, 0].reshape(len(y11), 1)
+y11=y11.astype(np.float64)
+y21=y21[:, 0].reshape(len(y21), 1)
+y21=y21.astype(np.float64)
+
 # Покажем, что данные действительно нужной размерности
 
 print(y2.shape, "\n")
 print(x2.shape, "\n")
+
+print(y21.shape, "\n")
+print(y11.shape, "\n")
+print(x21.shape, "\n")
+print(x11.shape, "\n")
 
 # Создание собственного класса с Виртуальным анализатором на основе шаблона SoftSensor из файла Essentials.py
 
@@ -125,4 +142,7 @@ Test_sensor_2.test(x1,y1,metric2)
 # Визуализация работы алгоритма
 
 test_visual=Visualizer_pred.Visualizer(x1, y1, timestamp1,[metric, metric2], 'Test gmdh Ria Sensor R2 metric')
-test_visual.visualize([Test_sensor_1, Test_sensor_2], lines=True)
+test_visual.visualize([Test_sensor_1, Test_sensor_2], lines=True, lines_vertical=True)
+
+#test_visual1=Visualizer_pred.Visualizer(x11, y11, timestamp11,[metric, metric2], 'Test gmdh Ria Sensor R2 metric')
+#test_visual1.visualize([Test_sensor_1, Test_sensor_2], lines=True)
