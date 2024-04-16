@@ -57,12 +57,15 @@ class Visualizer():
             df_metric = pd.DataFrame(data=metric_dict, index=index)
             data = [list(df_metric.columns)]
             data += df_metric.values.tolist()
+            #print(data)
             headers=list(df_metric.columns)
+            #print(headers)
             #for row in data:
             #    value=mse()
             #    errors.append(value)
+            #print(index)
             for i, model_name in enumerate(index):
-                data[i + 1].insert(0, model_name)
+                data[i+1].insert(0, model_name)
             headers.append(column_name)
             #print(data)
             #for i in range(len(data)):
