@@ -16,10 +16,12 @@ from sklearn.model_selection import train_test_split
 import gmdh
 from gmdh import Ria, split_data
 from gmdh import CriterionType, SequentialCriterion, Solver, PolynomialType
+pd.set_option('display.max_columns', None)  # Не ограничивать количество отображаемых столбцов
+pd.set_option('display.max_rows', None)  # Не ограничивать количество отображаемых строк
 
 # Загрузка данных. Возьмем архив Data_Average
 
-a=np.load('../Data_First_Nikita.npz', allow_pickle=True)
+data_archive=np.load('../Data_Exponential_Average.npz', allow_pickle=True)
 
 # Загрузка и подготовка данных
 
@@ -30,22 +32,29 @@ def prepare_Y(y):
 
     return y, timestamp
 
-all_X_1=a['all_X_1']
-all_X_2=a['all_X_2']
-all_X_3=a['all_X_3']
-all_Y_1=a['all_Y_1']
-all_Y_2=a['all_Y_2']
-all_Y_3=a['all_Y_3']
+ALL_column_names_1 = data_archive['column_names_1']
+all_X_1 = data_archive['all_X_1']
+all_Y_1 = data_archive['all_Y_1']
 
-#x_summer_half_2 = data_archive['x_summer_half_2']
-#y_summer_half_2 = data_archive['y_summer_half_2']
-#x_winter_half_2 = data_archive['x_winter_half_2']
-#y_winter_half_2 = data_archive['y_winter_half_2']
+ALL_column_names_2 = data_archive['column_names_2_cat']
+all_X_2 = data_archive['all_X_2']
+all_Y_2 = data_archive['all_Y_2']
 
-#x_summer_half_3 = data_archive['x_summer_half_3']
-#y_summer_half_3 = data_archive['y_summer_half_3']
-#x_winter_half_3 = data_archive['x_winter_half_3']
-#y_winter_half_3 = data_archive['y_winter_half_3']
+ALL_column_names_3 = data_archive['column_names_3_cat']
+all_X_3 = data_archive['all_X_3']
+all_Y_3 = data_archive['all_Y_3']
+
+column_names_2 = data_archive['column_names_2']
+x_summer_half_2 = data_archive['x_summer_half_2']
+y_summer_half_2 = data_archive['y_summer_half_2']
+x_winter_half_2 = data_archive['x_winter_half_2']
+y_winter_half_2 = data_archive['y_winter_half_2']
+
+column_names_3 = data_archive['column_names_3']
+x_summer_half_3 = data_archive['x_summer_half_3']
+y_summer_half_3 = data_archive['y_summer_half_3']
+x_winter_half_3 = data_archive['x_winter_half_3']
+y_winter_half_3 = data_archive['y_winter_half_3']
 
 df_X1 = pd.read_csv(r'../raw_X1.csv', index_col=0)
 df_X2 = pd.read_csv(r'../raw_X2.csv', index_col=0)
@@ -54,14 +63,51 @@ df_Y1 = pd.read_csv(r'../raw_Y1.csv', index_col=0)
 df_Y2 = pd.read_csv(r'../raw_Y1.csv', index_col=0)
 df_Y3 = pd.read_csv(r'../raw_Y1.csv', index_col=0)
 
-x_train, x_test, y_train, y_test=train_test_split(all_X_1, all_Y_1)
+x_train, x_test, y_train, y_test=train_test_split(all_X_1, all_Y_1, test_size=0.25, random_state=42)
 
 y_train, timestamp_train = prepare_Y(y_train)
+sorted_indices_train = np.argsort(timestamp_train)
+y_train = y_train[sorted_indices_train]
+timestamp_train = timestamp_train[sorted_indices_train]
+x_train = x_train[sorted_indices_train]
+
 y_test, timestamp_test = prepare_Y(y_test)
+sorted_indices_test = np.argsort(timestamp_test)
+y_test = y_test[sorted_indices_test]
+timestamp_test = timestamp_test[sorted_indices_test]
+x_test = x_test[sorted_indices_test]
+
 print(all_X_1.shape)
 print(all_Y_1.shape)
 print(x_train.shape)
 print(y_test.shape)
+
+x_train_winter, x_test_winter, y_train_winter, y_test_winter = train_test_split(x_winter_half_3, y_winter_half_3, test_size=0.2, random_state=42)
+x_train_summer, x_test_summer, y_train_summer, y_test_summer = train_test_split(x_summer_half_3, y_summer_half_3, test_size=0.2, random_state=42)
+
+y_train_summer, timestamp_train_summer = prepare_Y(y_train_summer)
+sorted_indices_train_summer = np.argsort(timestamp_train_summer)
+y_train_summer = y_train_summer[sorted_indices_train_summer]
+timestamp_train_summer = timestamp_train_summer[sorted_indices_train_summer]
+x_train_summer = x_train_summer[sorted_indices_train_summer]
+
+y_train_winter, timestamp_train_winter = prepare_Y(y_train_winter)
+sorted_indices_train_winter = np.argsort(timestamp_train_winter)
+y_train_winter = y_train_winter[sorted_indices_train_winter]
+timestamp_train_winter = timestamp_train_winter[sorted_indices_train_winter]
+x_train_winter = x_train_winter[sorted_indices_train_winter]
+
+y_test_summer, timestamp_test_summer = prepare_Y(y_test_summer)
+sorted_indices_test_summer = np.argsort(timestamp_test_summer)
+y_test_summer = y_test_summer[sorted_indices_test_summer]
+timestamp_test_summer = timestamp_test_summer[sorted_indices_test_summer]
+x_test_summer = x_test_summer[sorted_indices_test_summer]
+
+y_test_winter, timestamp_test_winter = prepare_Y(y_test_winter)
+sorted_indices_test_winter = np.argsort(timestamp_test_winter)
+y_test_winter = y_test_winter[sorted_indices_test_winter]
+timestamp_test_winter = timestamp_test_winter[sorted_indices_test_winter]
+x_test_winter = x_test_winter[sorted_indices_test_winter]
 
 column_names_X1 = df_X1.columns.tolist()
 column_names_X2 = df_X2.columns.tolist()
@@ -122,7 +168,7 @@ class gmdh_Ria(Essentials.SoftSensor):
     def train(self, x_train, y_train):
         preproc_y = self.preprocessing(y_train)
         preproc_x = self.preprocessing(x_train)
-        seq_criterion=SequentialCriterion(criterion_type=CriterionType.SYM_REGULARITY, second_criterion_type=CriterionType.SYM_STABILITY, solver=Solver.ACCURATE, top=10)
+        seq_criterion=SequentialCriterion(criterion_type=CriterionType.REGULARITY, second_criterion_type=CriterionType.STABILITY, solver=Solver.ACCURATE, top=10)
         model = gmdh.Ria()
 
         # вывод основной информации о параметрах методов и использовании критериев
@@ -144,7 +190,7 @@ class gmdh_Ria(Essentials.SoftSensor):
         #print(random_search.best_params_)
 
 
-        model.fit(preproc_x, preproc_y, k_best=6, test_size=0.55, n_jobs=-1, verbose=1, limit=0, p_average=2, criterion=seq_criterion, polynomial_type=PolynomialType.QUADRATIC)
+        model.fit(preproc_x, preproc_y, k_best=10, test_size=0.45, n_jobs=-1, verbose=0, limit=0, p_average=2, criterion=seq_criterion, polynomial_type=PolynomialType.QUADRATIC)
         self.set_model(model)
 
     def equation(self, feature_names, target_name):
