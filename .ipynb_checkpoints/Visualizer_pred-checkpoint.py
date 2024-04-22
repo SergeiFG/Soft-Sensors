@@ -108,14 +108,9 @@ class Visualizer():
                 ax2 = fig.add_subplot(grid[1, i])
                 ax3 = fig.add_subplot(grid[2, i])
                 for name, data in results.items():
-                    # print('Размеры')
-                    # print(data.shape)
-                    # print(self.timestamps.shape)
-                    tmp = np.concatenate([self.timestamps.reshape(-1,1), data.reshape(-1,1), results['From Lab'].reshape(-1,1)], axis=1)
-                    tmp = np.array(sorted(tmp, key= lambda x: x[0]))
-
-                    
-                    ax1.plot(tmp[:, 0], tmp[:, 1], linestyle='', marker=".", markersize=8, label=name)
+                    #print(data.shape)
+                    #print(type(data))
+                    ax1.plot(self.timestamps, data, linestyle='', marker=".", markersize=8, label=name)
                     points_plot, = ax2.plot(res['From Lab'], res['Arrange'], linestyle='', marker='.')
                     ax3.plot(results['From Lab'], results[model.get_name()], linestyle='', marker='.')
                     #ax2.legend([points_plot], ['Points'])
@@ -123,10 +118,10 @@ class Visualizer():
                     #print(data)
                 if lines:
                     for i in range(len(self.timestamps)-1):
-                        ax1.plot([tmp[i, 0], tmp[i+1, 0]], [tmp[i, 2], tmp[i+1, 2]], color='blue',
+                        ax1.plot([self.timestamps[i], self.timestamps[i+1]], [results['From Lab'][i], results['From Lab'][i+1]], color='blue',
                                  linestyle='-', linewidth=0.6)
-                        ax1.plot([tmp[i, 0], tmp[i+1, 0]],
-                                 [tmp[i, 1], tmp[i+1, 1]], color='orange',
+                        ax1.plot([self.timestamps[i], self.timestamps[i + 1]],
+                                 [results[model.get_name()][i], results[model.get_name()][i + 1]], color='orange',
                                  linestyle='-', linewidth=0.6)
                 if lines_vertical:
                     zero=[0]*len(res['From Lab'])
